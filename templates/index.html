@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <title>Búsqueda Tabú TSP</title>
+    <style>
+        /* Fuente y colores base */
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #6a11cb, #2575fc);
+            color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            font-weight: 600;
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+            text-align: center;
+        }
+
+        button {
+            background: #ff6f61;
+            border: none;
+            border-radius: 30px;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding: 12px 28px;
+            margin: 0 15px;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,111,97,0.5);
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        button:hover {
+            background-color: #ff3b2f;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #resultado {
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 25px 30px;
+            width: 90%;
+            max-width: 600px;
+            white-space: pre-line; /* para respetar saltos de línea */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: #fff;
+            text-align: center;
+        }
+
+        /* Responsive */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+            button {
+                margin: 10px 5px;
+                padding: 10px 20px;
+                font-size: 1rem;
+            }
+            #resultado {
+                font-size: 1rem;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Búsqueda Tabú - Problema del Viajero</h1>
+    <div>
+        <button onclick="inicializar()">Inicializar</button>
+        <button onclick="iterar()">Iterar</button>
+    </div>
+    <div id="resultado"></div>
+
+    <script>
+        const ciudades = ["A", "B", "C", "D"];
+        const distancias = {
+            "A": {"B": 10, "C": 15, "D": 20},
+            "B": {"A": 10, "C": 35, "D": 25},
+            "C": {"A": 15, "B": 35, "D": 30},
+            "D": {"A": 20, "B": 25, "C": 30}
+        };
+
+        async function inicializar() {
+            const res = await fetch('/inicializar', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ ciudades, distancias })
+            });
+            const data = await res.json();
+            document.getElementById('resultado').innerText = 'Ruta inicial: ' + data.ruta_inicial.join(' → ');
+        }
+
+        async function iterar() {
+            const res = await fetch('/iterar', { method: 'POST' });
+            const data = await res.json();
+            document.getElementById('resultado').innerText =
+                `Iteración: ${data.iteracion}\n` +
+                `Ruta actual: ${data.ruta_actual.join(' → ')} (${data.distancia_actual})\n` +
+                `Mejor ruta: ${data.mejor_ruta.join(' → ')} (${data.mejor_distancia})`;
+        }
+    </script>
+</body>
+</html>
